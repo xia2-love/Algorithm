@@ -1,0 +1,43 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{algorithmic}
+\usepackage[ruled,vlined]{algorithm2e}
+
+
+\begin{document}
+	\begin{algorithm}[htb]
+		\renewcommand{\thealgocf}{1}
+		\caption{Description of the SCL MAC decoder}  
+		\LinesNumbered %要求显示行号
+		\KwIn{Received vector $z^N$, path vector $b^{2N}$, list $L_{max}$}  
+		\KwOut{Decoded user bits $(\hat{u}^N,\hat{v}^{N})$}  
+		$\mathcal{L}\gets{\lbrace0\rbrace},PM_{0}^{(0)}\gets{0},i\gets{0},j\gets{0}$\;
+		\For{$k=1,...,2N$}  
+		{  
+			calculate $P[\tilde{s}_k]\gets{W_N^{(b_k,i,j)}}(z^N,\tilde{s}^{k-1}|\tilde{s}_k)$ from (11) and obtain $L_{2n}^{(k)}[l]$ from (19) for $\forall{l}\in{\mathcal{L}}$\; 
+			calculate $PM_l^{(k)}$ from (20) according to $L_{2n}^{(k)}[l], \hat{\tilde{s}}_{k-1}[l], PM_l^{(k-1)}$ and duplicatePath($l$) for  $\forall{l}\in{\mathcal{L}}$\; 
+			\If{$\tilde{s}_k$ is frozen}
+			{
+				\ForEach{$l\in{\mathcal{L}}$}{
+					\If{$\hat{\tilde{s}}_k[l]$ is not a frozen value}{
+						kill the thread $l$ and set $\mathcal{L}\gets{\mathcal{L}\setminus{\{l\}}}$
+					}
+				}
+			}
+			sorted by PM value in descending order for  $\forall{l}\in{\mathcal{L}}$\; 
+			\If{$|\mathcal{L}|>L_{max}$}
+			{
+				kill the thread $l$ whose PM value is in the first $|\mathcal{L}|-L_{max}$ and set $\mathcal{L}\gets{\mathcal{L}\setminus{\{l\}}}$ for $\forall{l}\in{\mathcal{L}}$\; 
+			}
+		} 
+		$l^{*}\gets{\arg{\min{_{l\in{\mathcal{L}}}}PM_l^{(2N)}}}$\;
+		\Return $(\hat{u}^{N}[l^*],\hat{v}^{N}[l^*])$\;
+		\textbf{subroutine}
+		{
+			duplicatePath($l$)\;
+			Copy the thread $l$ into a new thread $l'\notin{\mathcal{L}}$\\ 
+			$\mathcal{L}\gets{\mathcal{L}\cup{\{l'\}}}$\;
+			$(\hat{\tilde{s}}_k[l],PM_l^{(k)})\gets{(0,P[0])}$;\\ $(\hat{\tilde{s}}_k[l'],PM_{l'}^{(k)})\gets{(1,P[1])}$;
+		}
+		
+	\end{algorithm}
+\end{document}
